@@ -1,0 +1,7 @@
+counter := 10
+loop(counter) do {
+    if(counter > 0) {
+        say(counter)
+        counter := counter - 1
+    }
+}

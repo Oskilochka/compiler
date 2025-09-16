@@ -1,0 +1,4 @@
+x := 5
+loop(x) do {
+    say(x)
+}
