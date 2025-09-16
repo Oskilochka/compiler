@@ -1,19 +1,19 @@
 package org.josk.token
 
 enum TokenType {
-    IDENTIFIER,   // назви змінних, функцій
-    KEYWORD,      // зарезервовані слова Joovy: loop, do, if, say, ...
-    INT,          // цілі числа, наприклад 123
-    FLOAT,        // дійсні числа, наприклад 3.14
-    ASSIGN_OP,    // оператор присвоєння :=
-    ADD_OP,       // + та -
-    MULT_OP,      // * та /
-    PAR_OP,       // дужки: (, ), {, }
-    WS,           // пробіли та табуляції
-    NL,           // новий рядок
-    ERROR,         // помилки лексичного аналізу
+    IDENTIFIER,   // variables, func
+    KEYWORD,      // loop, say etc
+    INT,
+    FLOAT,
+    ASSIGN_OP,    // :=
+    ADD_OP,       // + or -
+    MULT_OP,      // * or /
+    PAR_OP,       // (, ), {, }
+    WS,           // whitespaces, tabulation
+    NL,           // new line
+    ERROR,        // lex analyze errors
     COMPARE_OP,
-    BOOL,      // логічні значення yes/no
-    STRING,    // рядковий тип
-    POWER_OP   // піднесення до степеня (^)
+    BOOL,      //  boolean values yes or no
+    STRING,
+    POWER_OP   // (^)
 }
