@@ -1,4 +1,59 @@
-x := 5
-loop(x) do {
-    say(x)
+// Однорядковий коментар
+
+/*
+   Багаторядковий коментар
+   перевірка Lexer
+*/
+
+// Define constants
+pin PI := 3.14159
+pin E := 2.71828
+
+// Function to calculate circle area
+task circleArea(radius) {
+    give PI * radius ^ 2
+}
+
+// Function to check if number is positive
+task isPositive(x) {
+    when x > 0 {
+        give yes
+    } otherwise {
+        give no
+    }
+}
+
+// Main program
+task main() {
+    // Ask user for input
+    show "Enter radius:"
+    ask r
+
+    // Check input
+    when isPositive(r) == yes {
+        show "Radius is positive"
+        show "Area of circle:"
+        show circleArea(r)
+    } otherwise {
+        show "Invalid input!"
+    }
+
+    // Loop example
+    loop i := 1 do 3 {
+        show "Iteration:"
+        show i
+        show "i squared:"
+        show i ^ 2
+    }
+
+    // Arithmetic examples
+    pin sum := 5 + 3 - 2
+    pin product := 4 * 2
+    pin powerExample := 2 ^ 3
+    show "Sum: "
+    show sum
+    show "Product: "
+    show product
+    show "Power: "
+    show powerExample
 }

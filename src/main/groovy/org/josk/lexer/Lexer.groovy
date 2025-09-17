@@ -19,24 +19,40 @@ class Lexer {
 
     List<Token> lex() {
         while (pos < code.length()) {
-            if (pos + 1 < code.length() && code[pos] == ':' && code[pos+1] == '=') {
+            String ch = code[pos]
+
+            if (ch == '"') {
+                String str = readString()
+                addToken(TokenType.STRING, str)
+                continue
+            }
+
+            if (ch in ['!', '=', '>', '<']) {
+                addMultiCharOperator(ch)
+                continue
+            }
+
+            if (pos + 1 < code.length() && ch == ':' && code[pos+1] == '=') {
                 addToken(TokenType.ASSIGN_OP, ":=")
                 pos += 2
                 continue
             }
 
-            String ch = code[pos]
-            String cls = classOfChar(ch)
-
-            switch(cls) {
+            switch(classOfChar(ch)) {
                 case 'Letter':
-                    String word = readWhile(['Letter', 'Digit'])
-                    addToken(isKeyword(word) ? TokenType.KEYWORD : TokenType.IDENTIFIER, word)
+                    String word = readWhileClosure { c -> classOfChar(c) in ['Letter','Digit'] }
+                    if (word in ['yes','no']) {
+                        addToken(TokenType.BOOL, word)
+                    } else if (LexerTables.KEYWORDS.contains(word)) {
+                        addToken(TokenType.KEYWORD, word)
+                    } else {
+                        addToken(TokenType.IDENTIFIER, word)
+                    }
                     break
 
                 case 'Digit':
-                    String num = readWhile(['Digit','Dot'])
-                    addToken(num.contains('.') ? TokenType.FLOAT : TokenType.INT, num)
+                    String num = readNumber()
+                    addToken(num.contains('.') || num.toLowerCase().contains('e') ? TokenType.FLOAT : TokenType.INT, num)
                     break
 
                 case 'WS':
@@ -47,6 +63,35 @@ class Lexer {
                 case 'NL':
                     if (!skipWhitespace)  addToken(TokenType.NL, "\\n")
                     lineNumber++
+                    pos++
+                    break
+
+                case '/':
+                    if (pos + 1 < code.length()) {
+                        if (code[pos+1] == '/') { // inline comment
+                            pos += 2
+                            while (pos < code.length() && code[pos] != '\n') pos++
+                            lineNumber++
+                            pos++
+                            break
+                        } else if (code[pos+1] == '*') { // multi-line comment
+                            pos += 2
+                            while (pos + 1 < code.length() && !(code[pos] == '*' && code[pos+1] == '/')) {
+                                if (code[pos] == '\n') lineNumber++
+                                pos++
+                            }
+                            pos += 2
+                            break
+                        } else {
+                            addToken(LexerTables.SINGLE_CHAR_TOKENS['/'], '/')
+                            pos++
+                            break
+                        }
+                    }
+                    break
+
+                case '^':
+                    addToken(TokenType.POWER_OP, '^')
                     pos++
                     break
 
@@ -78,15 +123,59 @@ class Lexer {
         tokens << new Token(value, type, lineNumber)
     }
 
-    private String readWhile(List<String> validClasses) {
+    private void addMultiCharOperator(String ch) {
+        if (pos + 1 < code.length()) {
+            String next = code[pos+1]
+            switch(ch) {
+                case '=':
+                    if (next == '=') { addToken(TokenType.COMPARE_OP, '=='); pos += 2; return }
+                    break
+                case '!':
+                    if (next == '=') { addToken(TokenType.COMPARE_OP, '!='); pos += 2; return }
+                    break
+                case '>':
+                    if (next == '=') { addToken(TokenType.COMPARE_OP, '>='); pos += 2; return }
+                    break
+                case '<':
+                    if (next == '=') { addToken(TokenType.COMPARE_OP, '<='); pos += 2; return }
+                    break
+            }
+        }
+        // if not a multi-character operator, add it as a single-character operator
+        addToken(LexerTables.SINGLE_CHAR_TOKENS[ch], ch)
+        pos++
+    }
+
+    private String readNumber() {
         StringBuilder buffer = new StringBuilder()
-        while (pos < code.length() && classOfChar(code[pos]) in validClasses) {
-            buffer << code[pos++]
+        buffer << readWhileClosure { c -> classOfChar(c) in ['Digit','Dot'] }
+        if (pos < code.length() && (code[pos] == 'e' || code[pos] == 'E')) {
+            buffer << code[pos++]  // add 'e' or 'E'
+            if (pos < code.length() && (code[pos] == '+' || code[pos] == '-')) {
+                buffer << code[pos++]
+            }
+            buffer << readWhileClosure { c -> classOfChar(c) == 'Digit' }
         }
         return buffer.toString()
     }
 
-    static boolean isKeyword(String word) {
-        LexerTables.KEYWORDS.contains(word)
+    private String readString() {
+        pos++ // Skip the opening "
+        StringBuilder buffer = new StringBuilder()
+        while (pos < code.length() && code[pos] != '"') {
+            if (code[pos] == '\n') lineNumber++
+            buffer << code[pos++]
+        }
+        pos++ // Skip the closing "
+        return buffer.toString()
+    }
+
+    // Flexible reading of character sequences using a Closure
+    private String readWhileClosure(Closure<Boolean> predicate) {
+        StringBuilder buffer = new StringBuilder()
+        while (pos < code.length() && predicate(code[pos])) {
+            buffer << code[pos++]
+        }
+        return buffer.toString()
     }
 }

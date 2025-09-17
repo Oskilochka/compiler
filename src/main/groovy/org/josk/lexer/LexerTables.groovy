@@ -14,7 +14,9 @@ class LexerTables {
     }
 
     static final Set<String> KEYWORDS = [
-            'loop','do','when','otherwise','say','ask','yes','no'
+            'loop','do','when','otherwise','show','ask',
+//            'yes','no',
+            'pin','task','give'
     ] as Set
 
     static final Map<String, TokenType> SINGLE_CHAR_TOKENS = [
@@ -28,6 +30,7 @@ class LexerTables {
             '}': TokenType.PAR_OP,
             '>': TokenType.COMPARE_OP,
             '<': TokenType.COMPARE_OP,
-            '=': TokenType.COMPARE_OP
+            '=': TokenType.COMPARE_OP,
+            '^': TokenType.POWER_OP
     ]
 }
