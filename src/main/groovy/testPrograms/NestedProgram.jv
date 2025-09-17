@@ -1,11 +1,7 @@
-// Однорядковий коментар
-
 /*
-   Багаторядковий коментар
-   перевірка Lexer
+   Define
+   constants
 */
-
-// Define constants
 pin PI := 3.14159
 pin E := 2.71828
 
