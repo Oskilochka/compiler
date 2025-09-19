@@ -1,16 +1,22 @@
 /*
-   Define
-   constants
+   Full Joovy Language Test
 */
-pin PI := 3.14159
-pin E := 2.71828
 
-// Function to calculate circle area
+// Constants
+pin PI, E := 3.14159, 2.71828
+pin MAX, MIN := 100, 0
+
+// Variables
+let radius, area : FLOAT
+let i, j, count : INT
+let isPositiveVar, flag : BOOL
+let name, greeting : STRING
+
+// Functions
 task circleArea(radius) {
     give PI * radius ^ 2
 }
 
-// Function to check if number is positive
 task isPositive(x) {
     when x > 0 {
         give yes
@@ -19,17 +25,25 @@ task isPositive(x) {
     }
 }
 
+task greetUser(name) {
+    show "Hello, "
+    show name
+}
+
 // Main program
 task main() {
     // Ask user for input
     show "Enter radius:"
-    ask r
+    ask radius
+    show "Enter your name:"
+    ask name
 
-    // Check input
-    when isPositive(r) == yes {
+    // Conditional
+    when isPositive(radius) == yes {
         show "Radius is positive"
+        area := circleArea(radius)
         show "Area of circle:"
-        show circleArea(r)
+        show area
     } otherwise {
         show "Invalid input!"
     }
@@ -42,14 +56,26 @@ task main() {
         show i ^ 2
     }
 
-    // Arithmetic examples
-    pin sum := 5 + 3 - 2
-    pin product := 4 * 2
-    pin powerExample := 2 ^ 3
-    show "Sum: "
-    show sum
-    show "Product: "
-    show product
-    show "Power: "
-    show powerExample
+    // Nested loop
+    loop i := 1 do 2 {
+        loop j := 1 do 2 {
+            show "i, j:"
+            show i, j
+        }
+    }
+
+    // Arithmetic and assignments
+    pin sum, product, powerExample := 5 + 3 - 2, 4 * 2, 2 ^ 3
+    let temp := sum * powerExample / 2 - 1
+    show "Sum: ", sum
+    show "Product: ", product
+    show "Power: ", powerExample
+    show "Temp: ", temp
+
+    // Boolean
+    flag := (sum > product)
+    show "Flag: ", flag
+
+    // Function call
+    greetUser(name)
 }

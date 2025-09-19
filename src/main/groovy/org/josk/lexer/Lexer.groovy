@@ -21,6 +21,18 @@ class Lexer {
         while (pos < code.length()) {
             String ch = code[pos]
 
+            if (pos + 1 < code.length() && ch == ':' && code[pos+1] == '=') {
+                addToken(TokenType.ASSIGN_OP, ":=")
+                pos += 2
+                continue
+            }
+
+            if (ch == ':') {
+                addToken(TokenType.COLON, ':')
+                pos++
+                continue
+            }
+
             if (ch == '"') {
                 String str = readString()
                 addToken(TokenType.STRING, str)
@@ -32,17 +44,13 @@ class Lexer {
                 continue
             }
 
-            if (pos + 1 < code.length() && ch == ':' && code[pos+1] == '=') {
-                addToken(TokenType.ASSIGN_OP, ":=")
-                pos += 2
-                continue
-            }
-
             switch(classOfChar(ch)) {
                 case 'Letter':
                     String word = readWhileClosure { c -> classOfChar(c) in ['Letter','Digit'] }
                     if (word in ['yes','no']) {
                         addToken(TokenType.BOOL, word)
+                    }  else if (LexerTables.TYPES.contains(word)) {
+                        addToken(TokenType.TYPE, word)
                     } else if (LexerTables.KEYWORDS.contains(word)) {
                         addToken(TokenType.KEYWORD, word)
                     } else {
@@ -95,14 +103,9 @@ class Lexer {
                     pos++
                     break
 
-                case ':':
-                    if (pos + 1 < code.length() && code[pos+1] == '=') {
-                        addToken(TokenType.ASSIGN_OP, ":=")
-                        pos += 2
-                    } else {
-                        addToken(TokenType.ERROR, ":")
-                        pos++
-                    }
+                case ',':
+                    addToken(TokenType.COMMA, ',')
+                    pos++
                     break
 
                 default:
@@ -160,17 +163,17 @@ class Lexer {
     }
 
     private String readString() {
-        pos++ // Skip the opening "
+        pos++ // skip the opening "
         StringBuilder buffer = new StringBuilder()
         while (pos < code.length() && code[pos] != '"') {
             if (code[pos] == '\n') lineNumber++
             buffer << code[pos++]
         }
-        pos++ // Skip the closing "
+        pos++ // skip the closing "
         return buffer.toString()
     }
 
-    // Flexible reading of character sequences using a Closure
+    // flexible reading of character sequences using a Closure
     private String readWhileClosure(Closure<Boolean> predicate) {
         StringBuilder buffer = new StringBuilder()
         while (pos < code.length() && predicate(code[pos])) {

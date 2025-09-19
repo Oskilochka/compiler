@@ -14,10 +14,11 @@ class LexerTables {
     }
 
     static final Set<String> KEYWORDS = [
-            'loop','do','when','otherwise','show','ask',
-//            'yes','no',
+            'loop','do','when','otherwise','show','ask', 'let',
             'pin','task','give'
     ] as Set
+
+    static final Set<String> TYPES = ['INT','FLOAT','BOOL','STRING'] as Set
 
     static final Map<String, TokenType> SINGLE_CHAR_TOKENS = [
             '+': TokenType.ADD_OP,
@@ -31,6 +32,7 @@ class LexerTables {
             '>': TokenType.COMPARE_OP,
             '<': TokenType.COMPARE_OP,
             '=': TokenType.COMPARE_OP,
-            '^': TokenType.POWER_OP
+            '^': TokenType.POWER_OP,
+            ',': TokenType.COMMA
     ]
 }
